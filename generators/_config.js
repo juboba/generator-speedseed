@@ -15,7 +15,7 @@ module.exports = {
             this.fs.copyTpl(
                 this.templatePath(fileTpl),
                 this.destinationPath(fileDest),
-                this.props
+                props
             )
         }
     },
