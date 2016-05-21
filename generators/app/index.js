@@ -1,10 +1,29 @@
 'use strict'
 
 const config = require('../_config.js')
+const generators = require('yeoman-generator')
 
-module.exports = require('yeoman-generator').Base.extend({
+module.exports = generators.Base.extend({
     paths() {
         config.paths.call(this)
+    },
+
+    constructor: function() {
+      generators.Base.apply(this, arguments)
+        
+      this.argument('appName', {
+        required: false,
+        defaults: this.appname,
+        type: 'String'
+      })
+
+      this.option('skip-install', {
+        desc: 'Use this to skip dependency installation',
+        defaults: false,
+        type: 'Boolean'
+      })
+
+      this.config.set('appName', this['appName'])
     },
 
     prompting() {
@@ -53,7 +72,10 @@ module.exports = require('yeoman-generator').Base.extend({
         create('seed/gitignore', './.gitignore')
 
         create('seed/gulpfile.js', './gulpfile.js')
-        create('seed/package.json', './package.json')
+        create('seed/package.json', './package.json', {
+          appName: this.appName,
+          description: this.description || ''
+        })
     },
 
     end() {
@@ -62,6 +84,13 @@ module.exports = require('yeoman-generator').Base.extend({
         if (this.config.get('template') !== 'no') {
             this.composeWith('speedseed:framework')
         }
+
+      if(! this.options['skip-install']) {
+        this.installDependencies({
+          npm: true,
+          bower: false
+        })
+      }
 
     }
 })
